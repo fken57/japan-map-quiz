@@ -121,26 +121,18 @@ function makeQuestions(data, mode, count, rng = Math.random) {
   }
   return pool.slice(0, count);
 }
-function distanceKm(a, b) {
-  const rad = Math.PI / 180;
-  const h = Math.sin((b[1]-a[1])*rad/2)**2 + Math.cos(a[1]*rad)*Math.cos(b[1]*rad)*Math.sin((b[0]-a[0])*rad/2)**2;
-  return 6371.0088 * 2 * Math.asin(Math.sqrt(Math.max(0, Math.min(1, h))));
-}
-function pointsForDistance(distance) {
-  if (!Number.isFinite(distance) || distance < 0) throw new RangeError('Invalid distance');
-  return Math.round(1000 * Math.exp(-Math.max(0, distance - 5) / 100));
-}
-function formatDistance(distance) { return `${distance < 10 ? distance.toFixed(1) : Math.round(distance).toLocaleString('ja-JP')} km`; }
+function isCorrect(target, selected) { return Boolean(selected && selected.id === target.id); }
 function parseSharedResult(hash) {
-  const match = /^#result=(easy|normal|hard)\.(15|30)\.(\d{1,5})$/.exec(hash);
-  if (!match || Number(match[3]) > Number(match[2])*1000) return null;
+  // 距離採点版の共有スコアと区別する。
+  const match = /^#result=area\.(easy|normal|hard)\.(15|30)\.(\d{1,2})$/.exec(hash);
+  if (!match || Number(match[3]) > Number(match[2])) return null;
   return {mode:match[1], count:Number(match[2]), score:Number(match[3])};
 }
 function createResultShare(href, mode, count, score, history = []) {
-  const hash = `#result=${mode}.${count}.${score}`;
+  const hash = `#result=area.${mode}.${count}.${score}`;
   if (!Number.isInteger(score) || !parseSharedResult(hash)) throw new RangeError('Invalid score');
   const url = new URL(href); url.search = ''; url.hash = hash;
-  const details = history.map((r, i) => `${i+1}. ${r.target.pref} ${r.target.name}：${r.guess ? `誤差 ${formatDistance(r.distance)}` : '未回答'} / ${r.points}点`).join('\n');
-  return {title:'日本市町村クイズ — ATLAS JAPAN', text:`日本市町村クイズに挑戦！\n${MODE_LABELS[mode]} · ${count}問 · ${score.toLocaleString('ja-JP')} / ${(count*1000).toLocaleString('ja-JP')}点（得点率 ${Math.round(score/(count*1000)*100)}%）${details ? '\n\n'+details : ''}\n\nあなたも日本をめぐろう！ #日本市町村クイズ`, url:url.href};
+  const details = history.map((r,i)=>`${i+1}. ${r.target.pref} ${r.target.name}：${r.correct ? '正解' : r.selected ? `不正解（回答：${r.selected.pref} ${r.selected.name}）` : '未回答'}`).join('\n');
+  return {title:'日本市町村クイズ — ATLAS JAPAN', text:`日本市町村クイズに挑戦！\n${MODE_LABELS[mode]} · ${score} / ${count}問正解（正答率 ${Math.round(score/count*100)}%）${details ? '\n\n'+details : ''}\n\nあなたも日本をめぐろう！ #日本市町村クイズ`, url:url.href};
 }
-if (typeof module !== 'undefined') module.exports = {MODE_LABELS, DIFFICULTY_PLACES, difficultyFor, getQuestionPool, makeQuestions, distanceKm, pointsForDistance, formatDistance, parseSharedResult, createResultShare};
+if (typeof module !== 'undefined') module.exports = {MODE_LABELS, DIFFICULTY_PLACES, difficultyFor, getQuestionPool, makeQuestions, isCorrect, parseSharedResult, createResultShare};

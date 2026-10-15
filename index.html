@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="市町村の役所はどこ？ 日本地図にピンを置き、役所までの距離で得点を競う15問・30問の地理クイズ。">
+  <meta name="description" content="日本地図で市町村の区域を選んで回答する15問・30問の地理クイズ。初級・中級・上級で挑戦しよう。">
   <meta name="theme-color" content="#f4f6f2"><title>日本市町村クイズ — ATLAS JAPAN</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=area-1">
   <script defer src="assets/d3.min.js"></script><script defer src="assets/topojson.min.js"></script>
-  <script defer src="quiz.js"></script><script defer src="app.js"></script>
+  <script defer src="quiz.js?v=area-1"></script><script defer src="app.js?v=area-1"></script>
 </head>
 <body>
 <header><a class="brand" href="./">◎ ATLAS <span>JAPAN</span></a><span class="header-note">知っている町も、まだ知らない村も。</span><a href="https://fken57.github.io/world-map-quiz/">世界地図版 ↗</a></header>
@@ -14,8 +14,8 @@
   <section id="shared" class="shared" hidden><div><small>FRIEND'S JOURNEY</small><p id="shared-text"></p><span>リンクに保存された自己申告のスコアです。</span></div><button id="challenge" class="secondary" disabled>同じ設定で挑戦</button></section>
   <section id="intro" class="intro">
     <div class="eyebrow">A LITTLE JOURNEY ACROSS JAPAN</div>
-    <h1>あの町の役所は、<br>どこにある？</h1>
-    <p>市町村の名前を見て、日本地図にピンを。<br>役所に近いほど、高得点。少しずつ日本に詳しくなる旅へ。</p>
+    <h1>あの町は、<br>どこにある？</h1>
+    <p>市町村の名前を見て、日本地図の区域を選ぼう。<br>市も、町も、村も。少しずつ日本に詳しくなる旅へ。</p>
     <div class="settings">
       <div class="setting-label"><b>難易度を選ぶ</b><span>時間制限なし</span></div>
       <div class="modes" role="group" aria-label="難易度">
@@ -31,31 +31,31 @@
   <section id="game" class="game" hidden>
     <div class="game-top"><span id="mode-badge" class="pill"></span><span id="question-count"></span><span><b id="score">0</b><span id="score-total"></span></span></div>
     <div class="progress"><div id="progress-bar"></div></div>
-    <div class="question"><div><div class="eyebrow">この市町村の役所を探してください</div><p id="prefecture"></p><h1 id="municipality-name"></h1><p id="reading"></p></div><button id="quit" class="text-button">終了する ↗</button></div>
-    <div class="answer-bar"><p id="feedback" role="status" aria-live="polite"></p><div class="answer-actions"><button id="skip" class="secondary">わからない</button><button id="answer" class="primary" disabled>この場所で回答 →</button><button id="next" class="primary" hidden>次の問題へ →</button></div></div>
+    <div class="question"><div><div class="eyebrow">この市町村を地図で選んでください</div><p id="prefecture"></p><h1 id="municipality-name"></h1><p id="reading"></p></div><button id="quit" class="text-button">終了する ↗</button></div>
+    <div class="answer-bar"><p id="feedback" role="status" aria-live="polite"></p><div class="answer-actions"><button id="skip" class="secondary">わからない</button><button id="answer" class="primary" disabled>この市町村で回答 →</button><button id="next" class="primary" hidden>次の問題へ →</button></div></div>
   </section>
   <section class="map-card" aria-label="回答用の日本地図">
-    <div class="map-top"><span>● EXPLORE JAPAN</span><span id="map-note">地図を拡大して、町の位置を探そう</span></div>
-    <div class="map-stage"><svg id="map" viewBox="0 0 1000 650" tabindex="0" role="group" aria-label="日本地図" aria-describedby="map-help"></svg><div class="map-tools"><button id="zoom-in" aria-label="地図を拡大">＋</button><button id="zoom-out" aria-label="地図を縮小">−</button><button id="reset-map" aria-label="日本全体を表示">⌂</button></div><div class="map-caption">海の上にもピンを置けます</div></div>
-    <div class="map-bottom"><span id="map-help">ドラッグで移動 · ピンチ／スクロールで拡大 · クリックでピン</span><span class="legend"><i class="guess"></i>あなたの回答 <i class="target"></i>役所の位置</span></div>
+    <div class="map-top"><span>● EXPLORE JAPAN</span><span id="map-note">地図を拡大して、市町村の区域を探そう</span></div>
+    <div class="map-stage"><svg id="map" viewBox="0 0 1000 650" tabindex="0" role="group" aria-label="市町村境界付きの日本地図" aria-describedby="map-help"></svg><div class="map-tools"><button id="zoom-in" aria-label="地図を拡大">＋</button><button id="zoom-out" aria-label="地図を縮小">−</button><button id="focus-prefecture" aria-label="出題の都道府県を表示" hidden>県</button><button id="reset-map" aria-label="日本全体を表示">⌂</button></div><div class="map-caption">市町村の区域をクリック・タップして選択</div></div>
+    <div class="map-bottom"><span id="map-help">ドラッグで移動 · ピンチ／スクロールで拡大 · 区域を選んで回答</span><span class="legend"><i class="guess"></i>選択 <i class="target"></i>正解 <i class="wrong-key"></i>不正解</span></div>
   </section>
   <section id="results" class="results" hidden>
     <div class="eyebrow">YOUR JOURNEY, COMPLETE</div><h1 id="result-heading"></h1>
     <div class="result-score"><span id="final-score"></span><small id="final-total"></small></div><p id="result-message"></p>
-    <div class="result-stats"><span>得点率 <b id="percentage"></b></span><span>5km以内 <b id="near-count"></b></span><span>回答した問題の平均誤差 <b id="average-distance"></b></span></div>
+    <div class="result-stats"><span>正答率 <b id="percentage"></b></span><span>不正解 <b id="wrong-count"></b></span><span>未回答 <b id="skipped-count"></b></span></div>
     <div class="result-actions"><button id="share" class="secondary">結果を共有 ↗</button><button id="copy" class="secondary">結果をコピー</button></div><p id="share-status" role="status" aria-live="polite"></p><textarea id="share-fallback" readonly hidden aria-label="共有する結果。選択してコピーできます。"></textarea>
     <div class="result-actions"><button id="retry" class="primary">同じ設定でもう一度 →</button><button id="home" class="secondary">設定を選び直す</button></div>
-    <details id="review-details" open><summary>旅を振り返る <span id="review-count"></span></summary><p class="review-help">市町村名を押すと、回答と役所の位置を地図で確認できます。</p><div id="review"></div></details>
+    <details id="review-details" open><summary>旅を振り返る <span id="review-count"></span></summary><p class="review-help">市町村名を押すと、正解の区域を地図で確認できます。</p><div id="review"></div></details>
   </section>
-  <section id="how" class="how"><div><span>01</span><b>市町村を知る</b><p>都道府県名と読みがながヒント</p></div><div><span>02</span><b>役所にピンを置く</b><p>5km以内なら1,000点満点</p></div><div><span>03</span><b>旅を振り返る</b><p>誤差と正解の位置を見直そう</p></div></section>
+  <section id="how" class="how"><div><span>01</span><b>市町村を知る</b><p>都道府県名と読みがながヒント</p></div><div><span>02</span><b>区域を選んで回答</b><p>正しい市町村なら正解</p></div><div><span>03</span><b>旅を振り返る</b><p>正解の区域を見直そう</p></div></section>
   <details class="rules"><summary>遊び方・採点・データについて</summary>
-    <p>市町村の領域ではなく、市役所・町役場・村役場の登録地点を当てるクイズです。市内でも役所から離れると減点されます。1問1,000点。誤差5km以内は満点、それ以遠は 1,000 × exp(−(距離km − 5) / 100) を四捨五入します。距離は地球上の2点間の最短距離で、道路距離ではありません。「わからない」は0点です。</p>
-    <p>15問は15,000点、30問は30,000点満点。1回の出題に重複はありません。市792・町村926の計1,718自治体を収録。東京都の特別区と政令指定都市の行政区は対象外です。町村名に含まれる郡は出題表示を省いています。</p>
+    <p>地図の市町村の区域を選び、「この市町村で回答」で確定します。正しい市町村なら1問正解。役所の位置や区域内のクリック位置では採点しません。選択中は黄色、回答後の正解は緑色、不正解の回答は赤色です。市町村名は回答後に表示します。</p>
+    <p>15問・30問から選択でき、1回の出題に重複はありません。市792・町村926の計1,718自治体を収録。東京都の特別区は対象外で、背景地図のみ表示します。政令指定都市は区をまとめて市全体を選択します。町村名に含まれる郡は出題表示を省いています。</p>
     <p>難易度は知名度や位置の推測しやすさを考慮した、本クイズ独自の分類です。初級は主要都市や有名な観光地、中級は地方都市や観光地の町村、上級はそれ以外の市町村から出題します。市・町・村という行政区分や人口順位だけでは分けていません。どの難易度でも都道府県名・読みがなを表示し、採点基準は共通です。</p>
-    <p>地図に地名や役所の目印は表示しません。キーボードでは地図にフォーカスし、矢印キーでピンを移動、Enterで中央にピンを設置、＋／−で拡大縮小できます。回答は「この場所で回答」で確定します。</p>
-    <p>役所の位置は <a href="https://github.com/code4fukui/localgovjp">localgovjp（CC0）</a> の2026年10月15日取得データを使用しています。庁舎移転・分庁舎などにより現在の本庁舎と異なる場合があります。登録地点を採点基準とします。地図は <a href="https://www.gsi.go.jp/kankyochiri/gm_jpn.html">国土地理院「地球地図日本」</a>を <a href="https://github.com/dataofjapan/land">dataofjapan/land</a> が変換したデータです。海岸線は簡略化されており、拡大しても市町村境界・道路は表示されません。</p>
+    <p>小さな町村は拡大して選んでください。「県」ボタンで出題の都道府県を表示できます。キーボードではTabで区域に移動し、矢印キーで区域を切り替え、Enter／Spaceで選択できます。＋／−で拡大縮小できます。</p>
+    <p>市町村名・読みがなは <a href="https://github.com/code4fukui/localgovjp">localgovjp（CC0）</a> を使用。境界は国土交通省 <a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html">国土数値情報「行政区域データ」2025年版（CC BY 4.0）</a>を <a href="https://github.com/kyodo-official/japan-choropleth">共同通信 japan-choropleth</a> が加工したデータを再加工しています。海岸線・境界を簡略化しているため、細い飛び地や小島の一部は省略されます。収録データの区域を正解とします。旧距離採点版の共有リンクは新方式のスコアとして表示しません。</p>
   </details>
 </main>
-<footer><span>ATLAS — 日本市町村クイズ</span><span>地図：国土地理院「地球地図日本」（加工） · <a href="assets/SOURCES.md">データ・ライセンス</a></span></footer>
+<footer><span>ATLAS — 日本市町村クイズ</span><span>地図：国土交通省「国土数値情報」／共同通信（加工） · <a href="assets/SOURCES.md">データ・ライセンス</a></span></footer>
 <noscript>このクイズを遊ぶにはJavaScriptを有効にしてください。</noscript>
 </body></html>
